@@ -13,6 +13,7 @@ ENV PHP_POST_MAX_SIZE: 512M
 RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     && pecl install xdebug \
     && docker-php-ext-enable xdebug \
+    && apk add --update linux-headers \
     && apk add --no-cache libtool bzip2-dev gettext-dev git icu icu-dev libintl libpng-dev libzip-dev mysql-client \
     #Install and enable PECL extensions
     && docker-php-source extract \
