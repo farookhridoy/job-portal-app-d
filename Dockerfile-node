@@ -1,0 +1,17 @@
+# Use an official Node.js image as the base image
+FROM node:alpine
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy Laravel application files (if needed)
+COPY . .
+
+# Install Node.js dependencies
+RUN npm install
+
+# Expose a port (if your Node.js app needs it)
+EXPOSE 3000
+
+# Start your Node.js application
+CMD ["npm"]

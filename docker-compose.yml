@@ -71,6 +71,20 @@ services:
             - database
         networks:
             - job-portal-network
+    node:
+        build:
+            context: .
+            dockerfile: Dockerfile-node
+        container_name: job-portal-node
+        restart: unless-stopped
+        volumes:
+            - ./:var/www/html:cached
+        ports:
+            - "3000:3000" # Map port 3000 on your host to port 3000 on the container
+        depends_on:
+            - app
+        networks:
+            - job-portal-network
 networks:
     job-portal-network:
         driver: bridge
