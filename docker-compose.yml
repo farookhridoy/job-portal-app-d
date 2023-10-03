@@ -18,7 +18,7 @@ services:
 
     app:
         build:
-            context: ./.docker/php
+            context: .
             dockerfile: Dockerfile
         container_name: job-portal-app
         restart: unless-stopped
@@ -74,11 +74,11 @@ services:
     node:
         build:
             context: .
-            dockerfile: Dockerfile-node
+            dockerfile: Dockerfile.node
         container_name: job-portal-node
         restart: unless-stopped
         volumes:
-            - ./:var/www/html:cached
+            - ./node_modules:/usr/src/node_modules
         ports:
             - "3000:3000" # Map port 3000 on your host to port 3000 on the container
         depends_on:
