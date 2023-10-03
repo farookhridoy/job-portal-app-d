@@ -1,0 +1,83 @@
+version: "3.8"
+services:
+    nginx:
+        image: nginx:alpine
+        container_name: job-portal
+        restart: unless-stopped
+        ports:
+            - 80:80
+            - 443:443
+        volumes:
+            - ./:var/www/html:cached
+            - ./.docker/nginx:etc/nginx/conf.d
+        #            - ./.docker/nginx/ssl:etc/nginx/conf.d/ssl
+        depends_on:
+            - app
+        networks:
+            - job-portal-network
+
+    app:
+        build:
+            context: ./.docker/php
+            dockerfile: Dockerfile
+        container_name: job-portal-app
+        restart: unless-stopped
+        volumes:
+            - ./:var/www/html:cached
+            - ./.docker/php/php-fpm.ini:/usr/local/etc/php/conf.d/custom.ini
+            - ~/.ssh:/root/.ssh
+        depends_on:
+            - database
+            - redis
+        networks:
+            - job-portal-network
+
+    database:
+        image: mysql:8.0
+        container_name: job-portal-database
+        restart: unless-stopped
+        ports:
+            - 3306:3306
+        environment:
+            - MYSQL_DATABASE=${DB_DATABASE}
+            - MYSQL_USER=${DB_USERNAME}
+            - MYSQL_PASSWORD=${DB_PASSWORD}
+            - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+        volumes:
+            - ./data/mysql:/var/lib/mysql
+        networks:
+            - job-portal-network
+
+    redis:
+        image: redis:alpine
+        container_name: job-portal-redis
+        command: redis-server --appendonly yes --requirepass  "${REDIS_PASSWORD}"
+        volumes:
+            - ./data/redis:/data
+        ports:
+            - 6379:6379
+        networks:
+            - job-portal-network
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: job-portal-phpmyadmin
+        environment:
+            PMA_HOST: database
+            PMA_PORT: 3306
+        ports:
+            - "8080:80" # Map port 8080 on your host to port 80 on the PHPMyAdmin container
+        depends_on:
+            - database
+        networks:
+            - job-portal-network
+networks:
+    job-portal-network:
+        driver: bridge
+
+volumes:
+    portal-app-volume:
+        driver: local
+
+
+
