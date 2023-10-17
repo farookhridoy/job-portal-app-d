@@ -92,6 +92,3 @@ networks:
 volumes:
     portal-app-volume:
         driver: local
-
-
-
